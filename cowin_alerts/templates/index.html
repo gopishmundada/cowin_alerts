@@ -12,39 +12,30 @@
       crossorigin="anonymous"
     />
     <link href="{{url_for('static',filename='css/index.css')}}" rel="stylesheet" />
-    <style>
-      .bd-placeholder-img {
-        font-size: 1.125rem;
-        text-anchor: middle;
-        -webkit-user-select: none;
-        -moz-user-select: none;
-        -ms-user-select: none;
-        user-select: none;
-      }
-
-      @media (min-width: 768px) {
-        .bd-placeholder-img-lg {
-          font-size: 3.5rem;
-        }
-      }
-    </style>
   </head>
   <body class="text-center">
-    <form class="form-signin">
-      <label class="sr-only">Name</label>
-      <input type="text" class="form-control" required autofocus />
-      <label class="sr-only">Email</label>
-      <input type="email" class="form-control" required />
-      <label class="sr-only">Pin-Code</label>
-      <input type="text" class="form-control" required />
+    {% from 'macros.html' import render_form_field %}
 
-      <div class="checkbox mb-3">
-        <label> <input type="checkbox" /> 18+ </label>
+    <form action="{{request.path}}" method="POST" class="form-signin">
+      {{ sub_form.hidden_tag() }}
+      <!-- prettier-ignore -->
+      {{ render_form_field(sub_form.name, class='form-control', placeholder='Your Name') }}
+      {{ render_form_field(sub_form.email, class='form-control', placeholder='Your email') }}
+      {{ render_form_field(sub_form.pincode, class='form-control', placeholder='Pin Code') }}
+
+      <div class="form-check form-switch mb-3 form-control-lg">
+        <!-- prettier-ignore -->
+        {{ sub_form.sub_18(class='form-check-input' )}} 
+        {{ sub_form.sub_18.label(class='form-check-label') }}
       </div>
-      <div class="checkbox mb-3">
-        <label> <input type="checkbox" /> 45+ </label>
+
+      <div class="form-check form-switch mb-3 form-control-lg">
+        <!-- prettier-ignore -->
+        {{ sub_form.sub_45(class='form-check-input' )}} 
+        {{ sub_form.sub_45.label(class='form-check-label') }}
       </div>
-      <button class="btn btn-lg btn-primary btn-block" type="submit">Subscribe</button>
+
+      <div class="mb-3">{{ sub_form.submit(class='btn btn-danger') }}</div>
     </form>
     <script
       src="https://code.jquery.com/jquery-3.5.1.slim.min.js"
