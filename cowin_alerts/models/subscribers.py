@@ -8,13 +8,8 @@ class Subscribers(db.Model):
         db.Integer,
         primary_key=True,
     )
-    first_name = db.Column(
-        'first_name',
-        db.String(64),
-        nullable=False,
-    )
-    last_name = db.Column(
-        'last_name',
+    name = db.Column(
+        'name',
         db.String(64),
         nullable=False,
     )
