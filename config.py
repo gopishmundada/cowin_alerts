@@ -25,6 +25,10 @@ class BaseConfig(object):
 
     SQLALCHEMY_DATABASE_URI = environ.get('DATABASE_URL')
 
+    if SQLALCHEMY_DATABASE_URI.startswith("postgres://"):
+        SQLALCHEMY_DATABASE_URI = SQLALCHEMY_DATABASE_URI.replace(
+            "postgres://", "postgresql://")
+
 
 class DevelopmentConfig(BaseConfig):
     FLASK_DEBUG = True
