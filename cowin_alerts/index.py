@@ -1,20 +1,21 @@
+from apscheduler.schedulers.background import BackgroundScheduler
 from flask import Blueprint, render_template
+
 from .forms import SubscribeForm
 from .models import Subscribers, db
-from apscheduler.schedulers.background import BackgroundScheduler
 
 
 def scheduled_job():
     print(f'======> Job run:')
 
 
-sched = BackgroundScheduler(daemon=True)
-sched.add_job(scheduled_job, 'interval', seconds=10)
-sched.start()
+scheduler = BackgroundScheduler(daemon=True)
+scheduler.add_job(scheduled_job, 'interval', seconds=10)
+scheduler.start()
 
 
 index_bp = Blueprint(
-    'index_bp',
+    'index_bp', 
     __name__,
     template_folder='templates',
     static_folder='static'
