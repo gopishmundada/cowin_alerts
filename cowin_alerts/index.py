@@ -4,11 +4,7 @@ from werkzeug.utils import redirect
 
 from .forms import SubscribeForm
 from .models import Subscribers, db
-
-
-def scheduled_job():
-    print(f'======> Job run:')
-
+from .utils import scheduled_job
 
 scheduler = BackgroundScheduler(daemon=True)
 scheduler.add_job(scheduled_job, 'interval', seconds=10)
