@@ -1,5 +1,5 @@
 from apscheduler.schedulers.background import BackgroundScheduler
-from flask import Blueprint, flash, render_template, request, url_for
+from flask import Blueprint, flash, render_template, request, url_for, current_app
 from werkzeug.utils import redirect
 
 from .forms import SubscribeForm
@@ -7,7 +7,8 @@ from .models import Subscribers, db
 from .utils import scheduled_job
 
 scheduler = BackgroundScheduler(daemon=True)
-scheduler.add_job(scheduled_job, 'interval', seconds=10)
+scheduler.add_job(scheduled_job, 'interval',
+                  seconds=current_app.config.get('ALERT_INTERVAL'))
 scheduler.start()
 
 

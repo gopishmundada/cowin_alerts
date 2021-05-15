@@ -29,6 +29,8 @@ class BaseConfig(object):
         SQLALCHEMY_DATABASE_URI = SQLALCHEMY_DATABASE_URI.replace(
             "postgres://", "postgresql://")
 
+    ALERT_INTERVAL = environ.get('ALERT_INTERVAL') or 30
+
 
 class DevelopmentConfig(BaseConfig):
     FLASK_DEBUG = True
