@@ -1,16 +1,9 @@
-from apscheduler.schedulers.background import BackgroundScheduler
-from flask import Blueprint, flash, render_template, request, url_for, current_app
+from flask import Blueprint, flash, render_template, request, url_for
 from werkzeug.utils import redirect
 
 from .forms import SubscribeForm
 from .models import Subscribers, db
-from .utils import scheduled_job
-
-scheduler = BackgroundScheduler(daemon=True)
-scheduler.add_job(scheduled_job, 'interval',
-                  seconds=current_app.config.get('ALERT_INTERVAL'))
-scheduler.start()
-
+from .utils import scheduler
 
 index_bp = Blueprint(
     'index_bp',
@@ -18,6 +11,8 @@ index_bp = Blueprint(
     template_folder='templates',
     static_folder='static'
 )
+
+scheduler.start()
 
 
 @index_bp.route('/', methods=['GET', 'POST'])
