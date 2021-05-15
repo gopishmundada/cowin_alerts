@@ -44,14 +44,14 @@
         <h1>India Cowin Alerts</h1>
         <p>Subscribe for instant <strong>Cowin Vaccine</strong> availability alerts.</p>
       </div>
-      <form action="{{request.path}}" method="POST">
+      <form action="{{request.path}}" method="POST" class="mb-4">
         <!-- prettier-ignore -->
         {{ sub_form.hidden_tag() }}
-      {{render_bootstrap_field(sub_form.name, placeholder="Your Name")}} 
-      {{render_bootstrap_field(sub_form.email, placeholder="abc@xyz.com")}} 
-      {{render_bootstrap_field(sub_form.pincode)}}
-      {% with messages = get_flashed_messages() %}
-      {% if messages %} {% for message in messages %}
+        {{render_bootstrap_field(sub_form.name, placeholder="Your Name")}} 
+        {{render_bootstrap_field(sub_form.email, placeholder="abc@xyz.com")}} 
+        {{render_bootstrap_field(sub_form.pincode)}}
+        {% with messages = get_flashed_messages() %}
+        {% if messages %} {% for message in messages %}
         <div class="form-group">
           <div class="alert alert-danger alert-dismissible fade show" role="alert">
             {{message}}
@@ -65,12 +65,12 @@
           <div class="custom-control custom-switch form-check-inline">
             <!-- prettier-ignore -->
             {{sub_form.sub_18(class="custom-control-input")}}
-          {{sub_form.sub_18.label(class="custom-control-label")}}
+            {{sub_form.sub_18.label(class="custom-control-label")}}
           </div>
           <div class="ml-4 custom-control custom-switch form-check-inline">
             <!-- prettier-ignore -->
             {{sub_form.sub_45(class="custom-control-input")}}
-          {{sub_form.sub_45.label(class="custom-control-label")}}
+            {{sub_form.sub_45.label(class="custom-control-label")}}
           </div>
         </div>
         <div class="form-group">{{ sub_form.submit(class='btn btn-primary') }}</div>
@@ -85,6 +85,13 @@
         </div>
         {%endif%}
       </form>
+      <div class="d-flex flex-column align-items-center mb-4 text-small">
+        <small class="mb-2 text-muted">Project developed by</small>
+        <small>
+          <a href="https://www.linkedin.com/in/akkisdiary/">Akshay Shegaonkar</a> |
+          <a href="https://www.linkedin.com/in/gopish-mundada/">Gopish Mundada</a>
+        </small>
+      </div>
     </div>
 
     <script
