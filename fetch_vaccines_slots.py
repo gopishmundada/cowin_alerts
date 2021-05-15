@@ -7,13 +7,8 @@ import time
 import smtplib
 s = smtplib.SMTP('smtp.gmail.com', 587)
 s.starttls()
-s.login("vaccine.alerts.india@gmail.com", "Cowin@1234")
-conn = psycopg2.connect(database="vlpaxxyk",
-  user="vlpaxxyk",
-  password="Hdaq9BzSKi41IA63cS-8W7xbkRCl6mKs",
-  host="queenie.db.elephantsql.com",
-  port="5432"
-)
+s.login()
+conn = psycopg2.connect()
 cur = conn.cursor()
 
 
