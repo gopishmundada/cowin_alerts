@@ -1,3 +1,20 @@
+{% macro render_bootstrap_field(field) %}
+
+<div class="form-group">
+  <!-- prettier-ignore -->
+  {{field.label()}}
+  {% if field.errors %}
+  {{field(class="form-control is-invalid",**kwargs)|safe }}
+  <div class="invalid-feedback">
+    {% for error in field.errors %}
+    <li>{{ error }}</li>
+    {% endfor %}
+  </div>
+  {%else%} {{field(class="form-control",**kwargs)|safe }} {% endif %}
+</div>
+
+{% endmacro %}
+
 <!DOCTYPE html>
 <html lang="en">
   <head>
@@ -14,24 +31,28 @@
     <link href="{{url_for('static',filename='css/index.css')}}" rel="stylesheet" />
   </head>
   <body class="d-flex justify-content-center">
-    <form action="{{request.path}}" method="POST">
+    <form
+      action="{{request.path}}"
+      method="POST"
+      class="col-lg-6 col-md-8 col-sm-10 needs-validation"
+    >
+      <!-- prettier-ignore -->
       {{ sub_form.hidden_tag() }}
-
-      <div class="form-group">
-        <!-- prettier-ignore -->
-        {{sub_form.name.label()}} 
-        {{sub_form.name(class="form-control", placeholder="Your Name")}}
-      </div>
-      <div class="form-group">
-        <!-- prettier-ignore -->
-        {{sub_form.email.label()}} 
-        {{sub_form.name(class="form-control", placeholder="abc@mail.com")}}
-        <small class="form-text text-muted">We'll never share your email with anyone else.</small>
-      </div>
-      <div class="form-group">
-        <!-- prettier-ignore -->
-        {{sub_form.pincode.label()}} 
-        {{sub_form.pincode(class="form-control", placeholder="Pin Code")}}
+      {{render_bootstrap_field(sub_form.name, placeholder="Your Name")}} 
+      {{render_bootstrap_field(sub_form.email, placeholder="abc@xyz.com")}} 
+      {{render_bootstrap_field(sub_form.pincode)}}
+      {% with messages = get_flashed_messages() %}
+        {% if messages %} {% for message in messages %}
+        <div class="form-group">
+          <div class="alert alert-danger alert-dismissible fade show" role="alert">
+            {{message}}
+            <button type="button" class="close" data-dismiss="alert" aria-label="Close">
+              <span aria-hidden="true">&times;</span>
+            </button>
+          </div>
+        </div>
+        {% endfor %} {% endif %}
+      {% endwith %}
       </div>
       <div class="form-group d-flex">
         <div class="custom-control custom-switch form-check-inline">
@@ -45,7 +66,17 @@
           {{sub_form.sub_45.label(class="custom-control-label")}}
         </div>
       </div>
-      {{ sub_form.submit(class='btn btn-primary') }}
+      <div class="form-group">{{ sub_form.submit(class='btn btn-primary') }}</div>
+      {%if success%}
+      <div class="form-group">
+        <div class="alert alert-success alert-dismissible fade show" role="alert">
+          You have successfully registered for <strong>Live Cowin Alerts</strong>
+          <button type="button" class="close" data-dismiss="alert" aria-label="Close">
+            <span aria-hidden="true">&times;</span>
+          </button>
+        </div>
+      </div>
+      {%endif%}
     </form>
     <script
       src="https://code.jquery.com/jquery-3.5.1.slim.min.js"
