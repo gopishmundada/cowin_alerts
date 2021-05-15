@@ -28,7 +28,7 @@ def index():
 
     if sub_form.validate_on_submit():
         subscriber = Subscribers(
-            name=sub_form.name.data,
+            name=sub_form.name.data.strip(),
             email=sub_form.email.data,
             pincode=sub_form.pincode.data,
             sub_18=sub_form.sub_18.data,
