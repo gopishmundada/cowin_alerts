@@ -1,6 +1,8 @@
 from flask_wtf import FlaskForm
 from wtforms import StringField, SubmitField, BooleanField, IntegerField
 from wtforms.validators import DataRequired, Email, ValidationError
+# from flask_wtf.html5 import NumberInput
+from wtforms.widgets.html5 import NumberInput
 
 
 class Pincode(object):
@@ -13,6 +15,7 @@ class Pincode(object):
         data = str(field.data)
         if len(data) != 6 and data.isnumeric():
             raise ValidationError(self.message)
+
 
 class SubscribeForm(FlaskForm):
     name = StringField(
@@ -32,6 +35,7 @@ class SubscribeForm(FlaskForm):
             DataRequired(),
             Pincode(),
         ],
+        widget=NumberInput(),
     )
     sub_18 = BooleanField('18+')
     sub_45 = BooleanField('45+')

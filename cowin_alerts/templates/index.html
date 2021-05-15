@@ -1,8 +1,7 @@
 {% macro render_bootstrap_field(field) %}
 
-<div class="form-group">
+<div class="form-floating mb-3">
   <!-- prettier-ignore -->
-  {{field.label()}}
   {% if field.errors %}
   {{field(class="form-control is-invalid",**kwargs)|safe }}
   <div class="invalid-feedback">
@@ -10,7 +9,7 @@
     <li>{{ error }}</li>
     {% endfor %}
   </div>
-  {%else%} {{field(class="form-control",**kwargs)|safe }} {% endif %}
+  {%else%} {{field(class="form-control",**kwargs)|safe }} {% endif %} {{field.label()}}
 </div>
 
 {% endmacro %}
@@ -24,66 +23,60 @@
     <link rel="shortcut icon" href="{{ url_for('static', filename='icons/vaccine.svg') }}" />
     <title>India Cowin Alerts</title>
     <link
+      href="https://cdn.jsdelivr.net/npm/bootstrap@5.0.1/dist/css/bootstrap.min.css"
       rel="stylesheet"
-      href="https://cdn.jsdelivr.net/npm/bootstrap@4.6.0/dist/css/bootstrap.min.css"
-      integrity="sha384-B0vP5xmATw1+K9KRQjQERJvTumQW0nPEzvF6L/Z6nronJ3oUOFUFpCjEUQouq2+l"
+      integrity="sha384-+0n0xVW2eSR5OomGNYDnhzAbDsOXxcvSN1TPprVMTNDbiYZCxYbOOl7+AMvyTG2x"
       crossorigin="anonymous"
     />
+
     <link href="{{url_for('static',filename='css/index.css')}}" rel="stylesheet" />
   </head>
-  <body class="d-flex justify-content-center">
-    <div class="col-lg-6 col-md-8 col-sm-10 needs-validation">
-      <div class="d-flex flex-column align-items-center mb-4">
-        <img
-          class="m-2"
-          src="{{url_for('static', filename='icons/vaccine.svg')}}"
-          alt=""
-          width="98"
-          height="98"
-        />
-        <h1>India Cowin Alerts</h1>
-        <p>Subscribe for instant <strong>Cowin Vaccine</strong> availability alerts.</p>
-      </div>
-      <form action="{{request.path}}" method="POST" class="mb-4">
+  <body class="text-center">
+    <main class="form-subscribe">
+      <img
+        class="m-2"
+        src="{{url_for('static', filename='icons/vaccine.svg')}}"
+        alt=""
+        width="98"
+        height="98"
+      />
+      <h1>India Cowin Alerts</h1>
+      <p>Subscribe for instant <strong>Cowin Vaccine</strong> availability alerts.</p>
+      <form action="{{request.path}}" method="POST" class="mb-4 mt-4">
+
+        {%if success%}
+        <div class="alert alert-success alert-dismissible fade show" role="alert">
+          You have successfully registered for <strong>Live Cowin Alerts</strong>
+          <button
+            type="button"
+            class="btn-close"
+            data-bs-dismiss="alert"
+            aria-label="Close"
+          ></button>
+        </div>
+        {%endif%}
         <!-- prettier-ignore -->
         {{ sub_form.hidden_tag() }}
-        {{render_bootstrap_field(sub_form.name, placeholder="Your Name")}} 
-        {{render_bootstrap_field(sub_form.email, placeholder="abc@xyz.com")}} 
+        {{render_bootstrap_field(sub_form.name)}} 
+        {{render_bootstrap_field(sub_form.email)}} 
         {{render_bootstrap_field(sub_form.pincode)}}
         {% with messages = get_flashed_messages() %}
         {% if messages %} {% for message in messages %}
-        <div class="form-group">
-          <div class="alert alert-danger alert-dismissible fade show" role="alert">
-            {{message}}
-            <button type="button" class="close" data-dismiss="alert" aria-label="Close">
-              <span aria-hidden="true">&times;</span>
-            </button>
-          </div>
-        </div>
+        <div class="alert alert-danger alert-dismissible fade show" role="alert">{{message}}</div>
         {% endfor %} {% endif %} {% endwith %}
-        <div class="form-group d-flex">
-          <div class="custom-control custom-switch form-check-inline">
+        <div class="mb-3">
+          <div class="form-check form-check-inline form-switch me-4">
             <!-- prettier-ignore -->
-            {{sub_form.sub_18(class="custom-control-input")}}
-            {{sub_form.sub_18.label(class="custom-control-label")}}
+            {{sub_form.sub_18(class="form-check-input")}}
+            {{sub_form.sub_18.label(class="form-check-label")}}
           </div>
-          <div class="ml-4 custom-control custom-switch form-check-inline">
+          <div class="form-check form-check-inline form-switch">
             <!-- prettier-ignore -->
-            {{sub_form.sub_45(class="custom-control-input")}}
-            {{sub_form.sub_45.label(class="custom-control-label")}}
+            {{sub_form.sub_45(class="form-check-input")}}
+            {{sub_form.sub_45.label(class="form-check-label")}}
           </div>
         </div>
-        <div class="form-group">{{ sub_form.submit(class='btn btn-primary') }}</div>
-        {%if success%}
-        <div class="form-group">
-          <div class="alert alert-success alert-dismissible fade show" role="alert">
-            You have successfully registered for <strong>Live Cowin Alerts</strong>
-            <button type="button" class="close" data-dismiss="alert" aria-label="Close">
-              <span aria-hidden="true">&times;</span>
-            </button>
-          </div>
-        </div>
-        {%endif%}
+        <div class="mb-3">{{ sub_form.submit(class='btn btn-primary') }}</div>
       </form>
       <div class="d-flex flex-column align-items-center mb-4 text-small">
         <small class="mb-2 text-muted">Project developed by</small>
@@ -92,16 +85,10 @@
           <a href="https://www.linkedin.com/in/gopish-mundada/">Gopish Mundada</a>
         </small>
       </div>
-    </div>
-
+    </main>
     <script
-      src="https://code.jquery.com/jquery-3.5.1.slim.min.js"
-      integrity="sha384-DfXdz2htPH0lsSSs5nCTpuj/zy4C+OGpamoFVy38MVBnE+IbbVYUew+OrCXaRkfj"
-      crossorigin="anonymous"
-    ></script>
-    <script
-      src="https://cdn.jsdelivr.net/npm/bootstrap@4.6.0/dist/js/bootstrap.bundle.min.js"
-      integrity="sha384-Piv4xVNRyMGpqkS2by6br4gNJ7DXjqk09RmUpJ8jgGtD7zP9yug3goQfGII0yAns"
+      src="https://cdn.jsdelivr.net/npm/bootstrap@5.0.1/dist/js/bootstrap.min.js"
+      integrity="sha384-Atwg2Pkwv9vp0ygtn1JAojH0nYbwNJLPhwyoVbhoPwBhjQPR5VtM2+xf0Uwh9KtT"
       crossorigin="anonymous"
     ></script>
   </body>
