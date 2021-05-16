@@ -22,14 +22,13 @@ scheduler.start()
 @index_bp.route('/', methods=['GET', 'POST'])
 def index():
     sub_form = SubscribeForm()
-    success = request.args.get('success') or False
 
     if sub_form.validate_on_submit():
         if not sub_form.sub_18.data and not sub_form.sub_45.data:
             flash('Please select at least 1 age group')
         else:
             pincode = Pincodes.query.get(sub_form.pincode.data)
-            
+
             if pincode == None:
                 pincode = Pincodes(pincode=sub_form.pincode.data)
                 db.session.add(pincode)
@@ -54,11 +53,16 @@ def index():
                           recipients=[subscriber.email], html=success_msg)
             mail.send(msg)
 
-            return redirect(url_for('index_bp.index', success=True))
+            return render_template(
+                'index.html',
+                title='Cowin Alerts',
+                sub_form=SubscribeForm(),
+                success=True,
+            )
 
     return render_template(
         'index.html',
         title='Cowin Alerts',
         sub_form=sub_form,
-        success=success,
+        success=False,
     )
