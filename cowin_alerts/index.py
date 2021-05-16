@@ -37,8 +37,13 @@ def index():
             db.session.add(subscriber)
             db.session.commit()
 
+            success_msg = render_template(
+                'subscribe-success-mail.html',
+                user_name=subscriber.name,
+                pincode=subscriber.pincode,
+            )
             msg = Message('Subscribied successfully for Cowin Alerts!',
-                          recipients=[sub_form.email.data.strip()], html='<b>Testing</b> asdkcnoi')
+                          recipients=[subscriber.email], html=success_msg)
 
             mail.send(msg)
 
