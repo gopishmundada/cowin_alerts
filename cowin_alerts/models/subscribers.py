@@ -73,11 +73,3 @@ class Pincodes(db.Model):
         db.DateTime,
         nullable=True,
     )
-    subscribers = db.relationship(
-        'Subscribers',
-        secondary=subscriber_pincode,
-        backref=db.backref(
-            'pincodes',
-            lazy='dynamic',
-        )
-    )

@@ -1,3 +1,5 @@
+from cowin_alerts.models.subscribers import Pincodes
+from cowin_alerts.forms.subscribe import Pincode
 from flask import Blueprint, flash, render_template, request, url_for
 from flask_mail import Message
 from werkzeug.utils import redirect
@@ -26,13 +28,19 @@ def index():
         if not sub_form.sub_18.data and not sub_form.sub_45.data:
             flash('Please select at least 1 age group')
         else:
+            pincode = Pincodes.query.get(sub_form.pincode.data)
+            
+            if pincode == None:
+                pincode = Pincodes(pincode=sub_form.pincode.data)
+                db.session.add(pincode)
+
             subscriber = Subscribers(
                 name=sub_form.name.data.strip(),
                 email=sub_form.email.data,
-                pincode=sub_form.pincode.data,
                 sub_18=sub_form.sub_18.data,
                 sub_45=sub_form.sub_45.data,
             )
+            subscriber.pincodes.append(pincode)
 
             db.session.add(subscriber)
             db.session.commit()
@@ -40,11 +48,10 @@ def index():
             success_msg = render_template(
                 'subscribe-success-mail.html',
                 user_name=subscriber.name,
-                pincode=subscriber.pincode,
+                pincode=pincode.pincode,
             )
             msg = Message('Subscribied successfully for Cowin Alerts!',
                           recipients=[subscriber.email], html=success_msg)
-
             mail.send(msg)
 
             return redirect(url_for('index_bp.index', success=True))
