@@ -7,3 +7,5 @@ python-dotenv
 gunicorn
 psycopg2
 APScheduler==3.3.1
+requests
+pandas
