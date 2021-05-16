@@ -1,6 +1,8 @@
 from flask import Blueprint, flash, render_template, request, url_for
+from flask_mail import Message
 from werkzeug.utils import redirect
 
+from . import mail
 from .forms import SubscribeForm
 from .models import Subscribers, db
 from .utils import scheduler
@@ -34,6 +36,11 @@ def index():
 
             db.session.add(subscriber)
             db.session.commit()
+
+            msg = Message('Subscribied successfully for Cowin Alerts!',
+                          recipients=[sub_form.email.data.strip()], html='<b>Testing</b> asdkcnoi')
+
+            mail.send(msg)
 
             return redirect(url_for('index_bp.index', success=True))
 

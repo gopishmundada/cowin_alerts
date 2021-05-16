@@ -1,10 +1,12 @@
-from flask import Flask
 from config import config_by_name
+from flask import Flask
+from flask_mail import Mail
 from flask_migrate import Migrate
 
 from .models import db
 
 migrate = Migrate()
+mail = Mail()
 
 
 def create_app(config_name):
@@ -15,6 +17,7 @@ def create_app(config_name):
 
     db.init_app(app)
     migrate.init_app(app, db)
+    mail.init_app(app)
 
     with app.app_context():
         from . import index

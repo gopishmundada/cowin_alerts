@@ -29,6 +29,14 @@ class BaseConfig(object):
         SQLALCHEMY_DATABASE_URI = SQLALCHEMY_DATABASE_URI.replace(
             "postgres://", "postgresql://")
 
+    MAIL_SERVER = 'smtp.gmail.com'
+    MAIL_PORT = 465
+    MAIL_USERNAME = environ.get('MAIL_USERNAME')
+    MAIL_PASSWORD = environ.get('MAIL_PASSWORD')
+    MAIL_USE_TLS = False
+    MAIL_USE_SSL = True
+    MAIL_DEFAULT_SENDER = MAIL_USERNAME
+
     ALERT_INTERVAL = environ.get('ALERT_INTERVAL') or 30
 
 

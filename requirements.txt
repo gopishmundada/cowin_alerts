@@ -1,5 +1,5 @@
 flask
-flask-sqlalchemy==2.4.4
+flask-sqlalchemy
 flask-migrate
 flask-wtf
 email-validator
@@ -9,3 +9,4 @@ psycopg2
 APScheduler==3.3.1
 requests
 pandas
+Flask-Mail
