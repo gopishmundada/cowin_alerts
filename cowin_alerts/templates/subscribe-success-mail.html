@@ -1,20 +1,43 @@
-<!DOCTYPE html>
-<html lang="en">
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional //EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html
+  xmlns="http://www.w3.org/1999/xhtml"
+  xmlns:v="urn:schemas-microsoft-com:vml"
+  xmlns:o="urn:schemas-microsoft-com:office:office"
+>
+  <meta http-equiv="Content-Type" content="text/html; charset=UTF-8" />
   <head>
-    <meta charset="UTF-8" />
-    <meta http-equiv="X-UA-Compatible" content="IE=edge" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <meta name="x-apple-disable-message-reformatting" />
+    <meta http-equiv="X-UA-Compatible" content="IE=edge" />
     <title></title>
+    <style type="text/css">
+      .content-area {
+        background-color: #f6f7f1;
+        padding: 3rem;
+        width: 100%;
+        border-radius: 10px;
+        width: fit-content;
+        height: fit-content;
+        color: #db9487;
+        font-family: Raleway, sans-serif;
+        font-size: 20px;
+      }
+      h1 {
+        color: #34a0a4;
+      }
+    </style>
+    <link
+      href="https://fonts.googleapis.com/css?family=Raleway:400,700&display=swap"
+      rel="stylesheet"
+      type="text/css"
+    />
   </head>
-
   <body>
-    <p>Hi {{user_name}},</p>
-
-    <p>
-      You have successfully registered for Cowin Vaccine Availability alert for Pincode:
-      <b>{{pincode}}</b>
-    </p>
-
-    <p>Thanks</p>
+    <div class="content-area">
+      <h1>Success</h1>
+      <p>Dear <i>{{user_name}},</i></p>
+      <p>Thank you for subscribing for Instant Cowin Alerts</p>
+      <p>Pincode: <strong>{{pincode}}</strong></p>
+    </div>
   </body>
 </html>
