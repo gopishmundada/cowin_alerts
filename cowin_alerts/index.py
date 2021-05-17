@@ -1,13 +1,13 @@
 from cowin_alerts.models.subscribers import Pincodes
 from cowin_alerts.forms.subscribe import Pincode
-from flask import Blueprint, flash, render_template, request, url_for
+from flask import Blueprint, flash, render_template
 from flask_mail import Message
-from werkzeug.utils import redirect
 
 from . import mail
 from .forms import SubscribeForm
 from .models import Subscribers, db
 from .utils import scheduler
+from .utils.schedule import test_date
 
 index_bp = Blueprint(
     'index_bp',
@@ -66,3 +66,9 @@ def index():
         sub_form=sub_form,
         success=False,
     )
+
+
+@index_bp.route('/run', methods=['GET', 'POST'])
+def run():
+    test_date()
+    return 'Run'
