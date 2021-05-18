@@ -2,8 +2,7 @@ import json
 import smtplib
 import time
 from datetime import datetime
-
-import pandas as pd
+import datetime
 import psycopg2
 import requests
 from apscheduler.schedulers.background import BackgroundScheduler
@@ -39,6 +38,7 @@ def fetchData(pincode, date):
     print(pincode)
     r = requests.get(url=api_url, params=params, headers=headers)
     print(r)
+    print("data_fetching fun")
     return r
 
 
@@ -56,6 +56,7 @@ def send_email(pin_code, age_grp, avail_slots, recipients):
     print(message)
     # sending the mail
     s.sendmail("vaccine.alerts.india@gmail.com", recipients, message)
+    print("mail sent for",age_grp,recipients)
 
 
 def create_msg(jsonData, i):
@@ -66,26 +67,29 @@ def create_msg(jsonData, i):
                 avail_data_45 += jsonData['centers'][x]['sessions'][y]['available_capacity']
             else:
                 avail_data_18 += jsonData['centers'][x]['sessions'][y]['available_capacity']
-            # send_email(msg)'''
-    if avail_data_18 > 0:
-        i.last_mail_sent_on = datetime.now()
+    print("create_msg fun started")
+    if avail_data_18 >= 0:
+        print("data avail for 18 fun started")
+        i.sub_18_last_mail_sent_on = datetime.now()
         recipients = [u.email for u in i.subscribers if u.sub_18]
-        send_email(i.pin_code, "18+", avail_data_18, recipients)
+        send_email(i.pincode, "18+", avail_data_18, recipients)
     if avail_data_45 >= 0:
-        i.last_mail_sent_on = datetime.now()
+        print("data avail for 45 fun started")
+        i.sub_45_last_mail_sent_on = datetime.now()
         recipients = [u.email for u in i.subscribers if u.sub_45]
         send_email(i.pincode, "45+", avail_data_45, recipients)
-
     db.session.commit()
 
 
 def test_date():
-    pincode = Pincodes.query.all()
-
-    for i in pincode:
-        print("Hii")
-        if i.last_mail_sent_on == None or ((datetime.now() - i.last_mail_sent_on).total_seconds() / 60) > 30:
-            base_today = (datetime.today()).strftime("%d-%m-%Y")
-            data_today = fetchData(i.pincode, base_today)
-            jsonData = data_today.json()
-            create_msg(jsonData, i)
+    try:
+        pincode = Pincodes.query.all()
+        for i in pincode:
+            if i.sub_18_last_mail_sent_on == None: #or ((datetime.now() - i.sub_18_last_mail_sent_on).total_seconds() / 60) >= 30 or i.sub_45_last_mail_sent_on == None or ((datetime.now() - i.sub_45_last_mail_sent_on).total_seconds() / 60) >= 30:
+                base_today = (datetime.today()).strftime("%d-%m-%Y")
+                data_today = fetchData(i.pincode, base_today)
+                jsonData = data_today.json()
+                create_msg(jsonData, i)
+    except:
+        pass
+#sub_18_last_mail_sent_on
