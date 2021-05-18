@@ -68,8 +68,13 @@ class Pincodes(db.Model):
         db.Integer,
         primary_key=True,
     )
-    last_mail_sent_on = db.Column(
-        'last_mail_sent',
+    sub_18_last_mail_sent_on = db.Column(
+        'sub_18_last_mail_sent_on',
+        db.DateTime,
+        nullable=True,
+    )
+    sub_45_last_mail_sent_on = db.Column(
+        'sub_45_last_mail_sent_on',
         db.DateTime,
         nullable=True,
     )
