@@ -1,7 +1,7 @@
-from cowin_alerts.models.subscribers import Pincodes
-from cowin_alerts.forms.subscribe import Pincode
 from flask import Blueprint, flash, render_template
 from flask_mail import Message
+
+from cowin_alerts.models.subscribers import Pincodes
 
 from . import mail
 from .forms import SubscribeForm
