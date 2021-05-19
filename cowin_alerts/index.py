@@ -7,7 +7,7 @@ from . import mail
 from .forms import SubscribeForm
 from .models import Subscribers, db
 from .utils import scheduler
-from .utils.schedule import test_date
+from .utils.schedule import check_and_send_email
 
 index_bp = Blueprint(
     'index_bp',
@@ -70,5 +70,6 @@ def index():
 
 @index_bp.route('/run', methods=['GET', 'POST'])
 def run():
-    test_date()
+    pin = Pincodes.query.get(431203)
+    check_and_send_email(pin)
     return 'Run'
