@@ -80,15 +80,15 @@ def check_and_send_email_scheduled():
     if slots_18 > 0 and should_send_18:
         send_available_email(
             subject='Vaccine slots available for 18+',
-            body=f'Dear User, \nVaccine slots are available.\nAge group: 18+\n Available Slots: {slots_18}\nPincode: {pincode.pincode}.\n Book your vaccine now!',
-            recipients=[sub.email for sub in pincode.subscribers if sub.sub_18]
+            body='Dear User, \nVaccine slots are available.\nAge group: 18+\n Available Slots: {}\nPincode: {}.\n Book your vaccine now!'.format(slots_18,pincode.pincode),
+            recipients=[sub.email for sub in pincode.subscribers if sub.sub_18 == True]
         )
 
     if slots_45 > 0 and should_send_45:
         send_available_email(
             subject='Vaccine slots available for 45+',
-            body=f'Dear User, \n Vaccine slots are available.\nAge group: 45+\n Available Slots: {slots_45}\nPincode: {pincode.pincode}.\n Book your vaccine now!',
-            recipients=[sub.email for sub in pincode.subscribers if sub.sub_18]
+            body='Dear User, \nVaccine slots are available.\nAge group: 45+\n Available Slots: {}\nPincode: {}.\n Book your vaccine now!'.format(slots_18,pincode.pincode),
+            recipients=[sub.email for sub in pincode.subscribers if sub.sub_45 == True]
         )
 
 
