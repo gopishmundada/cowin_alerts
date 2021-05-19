@@ -1,6 +1,4 @@
-import smtplib
 from datetime import datetime, timedelta
-from typing import List
 
 import requests
 from apscheduler.schedulers.background import BackgroundScheduler
@@ -109,14 +107,11 @@ def check_and_send_email(pincode: Pincodes):
 
 
 def scheduled_check_all_pincodes():
+    print('===> Checking for slots...')
     for district in Pincodes.query.all():
         check_and_send_email(district)
 
 
-def scheduled_job():
-    pass
-
-
 scheduler = BackgroundScheduler(daemon=True)
-scheduler.add_job(scheduled_job, 'interval',
+scheduler.add_job(scheduled_check_all_pincodes, 'interval',
                   seconds=current_app.config.get('ALERT_INTERVAL'))

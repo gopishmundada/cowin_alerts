@@ -16,6 +16,7 @@ def create_app(config_name):
     app.jinja_env.cache = {}
 
     db.init_app(app)
+    db.app = app
     migrate.init_app(app, db)
     mail.init_app(app)
 

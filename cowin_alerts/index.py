@@ -1,4 +1,4 @@
-from flask import Blueprint, flash, render_template
+from flask import Blueprint, flash, redirect, render_template, request, url_for
 from flask_mail import Message
 
 from cowin_alerts.models.subscribers import Pincodes
@@ -7,7 +7,6 @@ from . import mail
 from .forms import SubscribeForm
 from .models import Subscribers, db
 from .utils import scheduler
-from .utils.schedule import check_and_send_email
 
 index_bp = Blueprint(
     'index_bp',
@@ -22,6 +21,7 @@ scheduler.start()
 @index_bp.route('/', methods=['GET', 'POST'])
 def index():
     sub_form = SubscribeForm()
+    form_status = request.args.get('success')
 
     if sub_form.validate_on_submit():
         if not sub_form.sub_18.data and not sub_form.sub_45.data:
@@ -53,23 +53,11 @@ def index():
                           recipients=[subscriber.email], html=success_msg)
             mail.send(msg)
 
-            return render_template(
-                'index.html',
-                title='Cowin Alerts',
-                sub_form=SubscribeForm(),
-                success=True,
-            )
+            return redirect(url_for('index_bp.index', success=True))
 
     return render_template(
         'index.html',
         title='Cowin Alerts',
         sub_form=sub_form,
-        success=False,
+        success=form_status,
     )
-
-
-@index_bp.route('/run', methods=['GET', 'POST'])
-def run():
-    pin = Pincodes.query.get(431203)
-    check_and_send_email(pin)
-    return 'Run'
