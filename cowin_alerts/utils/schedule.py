@@ -1,4 +1,5 @@
 from datetime import datetime, timedelta
+from os import environ
 
 import requests
 from apscheduler.schedulers.background import BackgroundScheduler
@@ -8,9 +9,19 @@ from flask_mail import Message
 from .. import mail
 from ..models import Pincodes, db
 
+COWIN_API_TEST = 'https://api.demo.co-vin.in/api'
+COWIN_API_PROD = 'https://cdn-api.co-vin.in/api'
+CALENDER_BY_PIN_PATH = '/v2/appointment/sessions/public/calendarByPin'
+
+CALENDER_BY_PIN_URL = ''
+if environ.get('FLASK_ENV', 'Null') == 'production':
+    CALENDER_BY_PIN_URL = COWIN_API_PROD + CALENDER_BY_PIN_PATH
+else:
+    CALENDER_BY_PIN_URL = COWIN_API_TEST + CALENDER_BY_PIN_PATH
+
 
 def fetch_todays_data(pincode):
-    api_url = "https://cdn-api.co-vin.in/api/v2/appointment/sessions/public/calendarByPin"
+    api_url = CALENDER_BY_PIN_URL
     headers = {
         'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/90.0.4430.93 Safari/537.36',
     }
@@ -41,7 +52,7 @@ def get_slots(json_data):
 
 
 def send_available_email(subject='Vaccine slots available!', body='Email body', recipients=None):
-    if isinstance(recipients, list):
+    if not isinstance(recipients, list):
         raise ValueError('Empty recipients list.')
     if len(recipients) == 0:
         raise ValueError('Empty recipients list.')
