@@ -21,7 +21,7 @@ def create_app(config_name):
     scheduler.init_app(app)
 
     with app.app_context():
-        if app.config.get('FLASK_DEBUG'):
+        if not app.config.get('FLASK_DEBUG'):
             from . import check_slots
 
             scheduler.start()
