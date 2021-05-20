@@ -6,7 +6,6 @@ from cowin_alerts.models.subscribers import Pincodes
 from . import mail
 from .forms import SubscribeForm
 from .models import Subscribers, db
-from .utils import scheduler
 
 index_bp = Blueprint(
     'index_bp',
@@ -14,8 +13,6 @@ index_bp = Blueprint(
     template_folder='templates',
     static_folder='static'
 )
-
-scheduler.start()
 
 
 @index_bp.route('/', methods=['GET', 'POST'])

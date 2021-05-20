@@ -6,7 +6,7 @@ email-validator
 python-dotenv
 gunicorn
 psycopg2
-APScheduler==3.3.1
+Flask-APScheduler
 requests
 pandas
 Flask-Mail

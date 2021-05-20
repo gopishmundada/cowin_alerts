@@ -2,26 +2,17 @@ from datetime import datetime, timedelta
 from os import environ
 
 import requests
-from apscheduler.schedulers.background import BackgroundScheduler
-from flask import current_app
 from flask_mail import Message
+from flask import current_app
 
-from .. import mail
-from ..models import Pincodes, db
+from . import mail
+from .models import Pincodes, db
+from .scheduler import scheduler
 
-COWIN_API_TEST = 'https://api.demo.co-vin.in/api'
-COWIN_API_PROD = 'https://cdn-api.co-vin.in/api'
-CALENDER_BY_PIN_PATH = '/v2/appointment/sessions/public/calendarByPin'
-
-CALENDER_BY_PIN_URL = ''
-if environ.get('FLASK_ENV', 'Null') == 'production':
-    CALENDER_BY_PIN_URL = COWIN_API_PROD + CALENDER_BY_PIN_PATH
-else:
-    CALENDER_BY_PIN_URL = COWIN_API_TEST + CALENDER_BY_PIN_PATH
 
 
 def fetch_todays_data(pincode):
-    api_url = CALENDER_BY_PIN_URL
+    api_url = current_app.config.get('CALENDER_BY_PIN_URL')
     headers = {
         'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/90.0.4430.93 Safari/537.36',
     }
@@ -97,9 +88,10 @@ def check_and_send_email(pincode: Pincodes):
             )
             pincode.sub_18_last_mail_sent_on = datetime.now()
 
+            print(f'===> Mail sent: <{pincode.pincode}>')
             db.session.commit()
         except ValueError as e:
-            print(f'===> ERROR: {str(e)}')
+            print(f'===> ERROR: {e}')
 
     if can_send_mail(slots_45, pincode.sub_45_last_mail_sent_on):
         try:
@@ -112,17 +104,21 @@ def check_and_send_email(pincode: Pincodes):
             )
             pincode.sub_45_last_mail_sent_on = datetime.now()
 
+            print(f'===> Mail sent: <{pincode.pincode}>')
             db.session.commit()
         except ValueError as e:
-            print(f'===> ERROR: {str(e)}')
+            print(f'===> ERROR: {e}')
 
 
+@scheduler.task(
+    "interval",
+    id="check_all_pincodes",
+    seconds=30,
+    max_instances=1,
+)
 def scheduled_check_all_pincodes():
-    print('===> Checking for slots...')
-    for district in Pincodes.query.all():
-        check_and_send_email(district)
+    with scheduler.app.app_context():
+        print('==> Checking for slots...')
 
-
-scheduler = BackgroundScheduler(daemon=True)
-scheduler.add_job(scheduled_check_all_pincodes, 'interval',
-                  seconds=current_app.config.get('ALERT_INTERVAL'))
+        for district in Pincodes.query.all():
+            check_and_send_email(district)
