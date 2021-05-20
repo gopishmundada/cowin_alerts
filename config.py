@@ -5,6 +5,10 @@ from dotenv import load_dotenv
 basedir = path.abspath(path.dirname(__file__))
 load_dotenv(path.join(basedir, '.env'))
 
+COWIN_API_PROD = 'https://cdn-api.co-vin.in/api'
+COWIN_API_TEST = 'https://api.demo.co-vin.in/api'
+CALENDER_BY_PIN_PATH = '/v2/appointment/sessions/public/calendarByPin'
+
 
 class BaseConfig(object):
     FLASK_APP = 'wsgi.py'
@@ -38,11 +42,16 @@ class BaseConfig(object):
     MAIL_DEFAULT_SENDER = MAIL_USERNAME
 
     ALERT_INTERVAL = environ.get('ALERT_INTERVAL') or 30
+    SCHEDULER_API_ENABLED = True
+
+    CALENDER_BY_PIN_URL = COWIN_API_PROD + CALENDER_BY_PIN_PATH
 
 
 class DevelopmentConfig(BaseConfig):
     FLASK_DEBUG = True
     TESTING = False
+
+    CALENDER_BY_PIN_URL = COWIN_API_TEST + CALENDER_BY_PIN_PATH
 
 
 class TestConfig(BaseConfig):
