@@ -4,11 +4,11 @@ from os import environ
 import requests
 from flask_mail import Message
 from flask import current_app
+from requests.models import HTTPError
 
 from . import mail
 from .models import Pincodes, db
 from .scheduler import scheduler
-
 
 
 def fetch_todays_data(pincode):
@@ -22,11 +22,9 @@ def fetch_todays_data(pincode):
     }
 
     res = requests.get(url=api_url, params=params, headers=headers)
+    res.raise_for_status()
 
-    if res.status_code == 200:
-        return res.json()
-    else:
-        return None
+    return res.json()
 
 
 def get_slots(json_data):
@@ -63,17 +61,16 @@ def can_send_mail(slots: int, mail_sent_on: datetime) -> bool:
             return mail_sent_on < last_hour
         else:
             return True
+
     return False
 
 
 def check_and_send_email(pincode: Pincodes):
     if not isinstance(pincode, Pincodes):
-        return
+        raise ValueError(
+            'check_ans_send_email() requires instance of <Pincodes>')
 
     slots_data = fetch_todays_data(pincode.pincode)
-
-    if not slots_data:
-        return
 
     slots_18, slots_45 = get_slots(slots_data)
 
@@ -121,4 +118,9 @@ def scheduled_check_all_pincodes():
         print('==> Checking for slots...')
 
         for district in Pincodes.query.all():
-            check_and_send_email(district)
+            try:
+                check_and_send_email(district)
+            except ValueError as vErr:
+                print(f'==> ERROR: {vErr} <==')
+            except HTTPError as httpErr:
+                print(f'==> ERROR: {httpErr} <==')
