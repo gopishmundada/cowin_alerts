@@ -1,17 +1,19 @@
 from datetime import datetime, timedelta
-from os import environ
 
 import requests
 from flask_mail import Message
 from flask import current_app
-from requests.models import HTTPError
+from requests.exceptions import HTTPError
 
 from . import mail
 from .models import Pincodes, db
 from .scheduler import scheduler
 
+EMAIL_SUBJECT = 'Vaccine slots available for {}+'
+EMAIL_BODY = 'Dear User, \nVaccine slots are available.\nAge group: {}+\n Available Slots: {}\nPincode: {}.\n Book your vaccine now!'
 
-def fetch_todays_data(pincode):
+
+def get_todays_data(pincode):
     api_url = current_app.config.get('CALENDER_BY_PIN_URL')
     headers = {
         'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/90.0.4430.93 Safari/537.36',
@@ -40,20 +42,6 @@ def get_slots(json_data):
     return avail_data_18, avail_data_45
 
 
-def send_available_email(subject='Vaccine slots available!', body='Email body', recipients=None):
-    if not isinstance(recipients, list):
-        raise ValueError('Empty recipients list.')
-    if len(recipients) == 0:
-        raise ValueError('Empty recipients list.')
-
-    msg = Message(
-        subject=subject,
-        html=body,
-        recipients=recipients
-    )
-    mail.send(msg)
-
-
 def can_send_mail(slots: int, mail_sent_on: datetime) -> bool:
     if slots and slots > 0:
         if isinstance(mail_sent_on, datetime):
@@ -65,46 +53,63 @@ def can_send_mail(slots: int, mail_sent_on: datetime) -> bool:
     return False
 
 
-def check_and_send_email(pincode: Pincodes):
-    if not isinstance(pincode, Pincodes):
-        raise ValueError(
-            'check_ans_send_email() requires instance of <Pincodes>')
+def send_available_email(
+    recipients: list,
+    last_mail_on: datetime,
+    slots: int,
+    subject: str,
+    body: str = 'Vaccine Slots are available'
+) -> bool:
+    '''
+    Returns True if mail sent successfully
+    '''
 
-    slots_data = fetch_todays_data(pincode.pincode)
+    if len(recipients) == 0:
+        return False
+    if not can_send_mail(slots, last_mail_on):
+        return False
 
-    slots_18, slots_45 = get_slots(slots_data)
+    msg = Message(
+        subject=subject,
+        html=body,
+        recipients=recipients
+    )
+    mail.send(msg)
 
-    if can_send_mail(slots_18, pincode.sub_18_last_mail_sent_on):
-        try:
-            send_available_email(
-                subject='Vaccine slots available for 18+',
-                body='Dear User, \nVaccine slots are available.\nAge group: 18+\n Available Slots: {}\nPincode: {}.\n Book your vaccine now!'.format(
-                    slots_18, pincode.pincode),
-                recipients=[
-                    sub.email for sub in pincode.subscribers if sub.sub_18 == True]
-            )
-            pincode.sub_18_last_mail_sent_on = datetime.now()
+    return True
 
-            print(f'===> Mail sent: <{pincode.pincode}>')
-            db.session.commit()
-        except ValueError as e:
-            print(f'===> ERROR: {e}')
 
-    if can_send_mail(slots_45, pincode.sub_45_last_mail_sent_on):
-        try:
-            send_available_email(
-                subject='Vaccine slots available for 45+',
-                body='Dear User, \nVaccine slots are available.\nAge group: 45+\n Available Slots: {}\nPincode: {}.\n Book your vaccine now!'.format(
-                    slots_18, pincode.pincode),
-                recipients=[
-                    sub.email for sub in pincode.subscribers if sub.sub_45 == True]
-            )
-            pincode.sub_45_last_mail_sent_on = datetime.now()
+def check_slots_and_send_email(district: Pincodes):
+    if not isinstance(district, Pincodes):
+        raise ValueError('Required instance of <Pincodes>')
 
-            print(f'===> Mail sent: <{pincode.pincode}>')
-            db.session.commit()
-        except ValueError as e:
-            print(f'===> ERROR: {e}')
+    # slots_data = get_todays_data(district.pincode)
+    # slots_18, slots_45 = get_slots(slots_data)
+    slots_18, slots_45 = 25, 25
+
+    status_18 = send_available_email(
+        recipients=[sub.email for sub in district.subscribers if sub.sub_18],
+        last_mail_on=district.sub_18_last_mail_sent_on,
+        slots=slots_18,
+        subject=EMAIL_SUBJECT.format(18),
+        body=EMAIL_BODY.format(18, slots_18, district.pincode)
+    )
+    if status_18:
+        district.sub_18_last_mail_sent_on = datetime.now()
+        db.session.commit()
+        print(f'** Mail sent: <{district.pincode} 18+>')
+
+    status_45 = send_available_email(
+        recipients=[sub.email for sub in district.subscribers if sub.sub_45],
+        last_mail_on=district.sub_45_last_mail_sent_on,
+        slots=slots_45,
+        subject=EMAIL_SUBJECT.format(45),
+        body=EMAIL_BODY.format(45, slots_45, district.pincode)
+    )
+    if status_45:
+        district.sub_45_last_mail_sent_on = datetime.now()
+        db.session.commit()
+        print(f'** Mail sent: <{district.pincode} 45+>')
 
 
 @scheduler.task(
@@ -115,12 +120,12 @@ def check_and_send_email(pincode: Pincodes):
 )
 def scheduled_check_all_pincodes():
     with scheduler.app.app_context():
-        print('==> Checking for slots...')
+        print('** Checking for slots...')
 
         for district in Pincodes.query.all():
             try:
-                check_and_send_email(district)
+                check_slots_and_send_email(district)
             except ValueError as vErr:
-                print(f'==> ERROR: {vErr} <==')
+                print(f'Value Error: {vErr} <==')
             except HTTPError as httpErr:
-                print(f'==> ERROR: {httpErr} <==')
+                print(f'Request Error: {httpErr}')
