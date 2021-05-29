@@ -69,12 +69,12 @@ def send_available_email(
     if not can_send_mail(slots, last_mail_on):
         return False
 
-    msg = Message(
-        subject=subject,
-        html=body,
-        recipients=recipients
-    )
-    mail.send(msg)
+    for email in recipients:
+        mail.send(Message(
+            subject=subject,
+            html=body,
+            recipients=[email]
+        ))
 
     return True
 
