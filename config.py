@@ -6,7 +6,7 @@ basedir = path.abspath(path.dirname(__file__))
 load_dotenv(path.join(basedir, '.env'))
 
 COWIN_API_PROD = 'https://cdn-api.co-vin.in/api'
-COWIN_API_TEST = 'https://api.demo.co-vin.in/api'
+COWIN_API_TEST = 'https://cdndemo-api.co-vin.in/api'
 CALENDER_BY_PIN_PATH = '/v2/appointment/sessions/public/calendarByPin'
 
 
@@ -51,7 +51,7 @@ class DevelopmentConfig(BaseConfig):
     FLASK_DEBUG = True
     TESTING = False
 
-    CALENDER_BY_PIN_URL = COWIN_API_TEST + CALENDER_BY_PIN_PATH
+    # CALENDER_BY_PIN_URL = COWIN_API_TEST + CALENDER_BY_PIN_PATH
 
 
 class TestConfig(BaseConfig):
