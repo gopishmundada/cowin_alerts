@@ -83,9 +83,8 @@ def check_slots_and_send_email(district: Pincodes):
     if not isinstance(district, Pincodes):
         raise ValueError('Required instance of <Pincodes>')
 
-    # slots_data = get_todays_data(district.pincode)
-    # slots_18, slots_45 = get_slots(slots_data)
-    slots_18, slots_45 = 25, 25
+    slots_data = get_todays_data(district.pincode)
+    slots_18, slots_45 = get_slots(slots_data)
 
     status_18 = send_available_email(
         recipients=[sub.email for sub in district.subscribers if sub.sub_18],
