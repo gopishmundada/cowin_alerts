@@ -30,24 +30,39 @@ def index():
                 pincode = Pincodes(pincode=sub_form.pincode.data)
                 db.session.add(pincode)
 
-            subscriber = Subscribers(
-                name=sub_form.name.data.strip(),
-                email=sub_form.email.data,
-                sub_18=sub_form.sub_18.data,
-                sub_45=sub_form.sub_45.data,
-            )
-            subscriber.pincodes.append(pincode)
+            subscriber_email = sub_form.email.data.lower().strip()
+            subscriber_name = sub_form.name.data.lower()
 
-            db.session.add(subscriber)
+            existing_subscriber = Subscribers.query.filter_by(
+                email=subscriber_email).first()
+
+            if existing_subscriber:
+                existing_subscriber.update_preferences(
+                    sub_18=sub_form.sub_18.data,
+                    sub_45=sub_form.sub_45.data,
+                )
+
+                subscriber_name = existing_subscriber.name
+            else:
+                new_subscriber = Subscribers(
+                    name=sub_form.name.data.strip(),
+                    email=subscriber_email,
+                    sub_18=sub_form.sub_18.data,
+                    sub_45=sub_form.sub_45.data,
+                )
+                new_subscriber.pincodes.append(pincode)
+
+                db.session.add(new_subscriber)
+
             db.session.commit()
 
             success_msg = render_template(
                 'subscribe-success-mail.html',
-                user_name=subscriber.name,
+                user_name=subscriber_name,
                 pincode=pincode.pincode,
             )
             mail.send(Message('Subscribied successfully for Cowin Alerts!',
-                              recipients=[subscriber.email],
+                              recipients=[subscriber_email],
                               html=success_msg))
 
             return redirect(url_for('index_bp.index', success=True))
