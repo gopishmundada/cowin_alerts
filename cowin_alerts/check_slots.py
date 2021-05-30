@@ -13,7 +13,7 @@ EMAIL_SUBJECT = 'Vaccine slots available for {}+'
 EMAIL_BODY = 'Dear User, \nVaccine slots are available.\nAge group: {}+\n Available Slots: {}\nPincode: {}.\n Book your vaccine now!'
 
 
-def get_todays_data(pincode):
+def get_todays_data(pincode: int) -> dict:
     api_url = current_app.config.get('CALENDER_BY_PIN_URL')
     headers = {
         'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/90.0.4430.93 Safari/537.36',
@@ -29,7 +29,7 @@ def get_todays_data(pincode):
     return res.json()
 
 
-def get_slots(json_data):
+def get_slots(json_data: dict) -> tuple:
     avail_data_45 = avail_data_18 = 0
 
     for x in range(len(json_data['centers'])):
@@ -61,7 +61,10 @@ def send_available_email(
     body: str = 'Vaccine Slots are available'
 ) -> bool:
     '''
-    Returns True if mail sent successfully
+    Sends vaccine availability mail to recipients if mail can be send.
+    Checks for number of available slots and last mail sent datetime.
+
+    :return: True if mail sent successfully False otherwise.
     '''
 
     if len(recipients) == 0:
@@ -69,23 +72,19 @@ def send_available_email(
     if not can_send_mail(slots, last_mail_on):
         return False
 
-    for email in recipients:
-        mail.send(Message(
-            subject=subject,
-            html=body,
-            recipients=[email]
-        ))
+    mail.send(Message(subject=subject, html=body, bcc=recipients))
 
     return True
 
 
-def check_slots_and_send_email(district: Pincodes):
+def check_slots_and_send_email(district: Pincodes) -> None:
     if not isinstance(district, Pincodes):
         raise ValueError('Required instance of <Pincodes>')
 
     slots_data = get_todays_data(district.pincode)
     slots_18, slots_45 = get_slots(slots_data)
 
+    # Send mail to 18+ subscribers if slots are available
     status_18 = send_available_email(
         recipients=[sub.email for sub in district.subscribers if sub.sub_18],
         last_mail_on=district.sub_18_last_mail_sent_on,
@@ -93,11 +92,12 @@ def check_slots_and_send_email(district: Pincodes):
         subject=EMAIL_SUBJECT.format(18),
         body=EMAIL_BODY.format(18, slots_18, district.pincode)
     )
-    if status_18:
+    if status_18:  # Update last mail time
         district.sub_18_last_mail_sent_on = datetime.now()
         db.session.commit()
         print(f'** Mail sent: <{district.pincode} 18+>')
 
+    # Send mail to 45+ subscribers if slots are available
     status_45 = send_available_email(
         recipients=[sub.email for sub in district.subscribers if sub.sub_45],
         last_mail_on=district.sub_45_last_mail_sent_on,
@@ -105,7 +105,7 @@ def check_slots_and_send_email(district: Pincodes):
         subject=EMAIL_SUBJECT.format(45),
         body=EMAIL_BODY.format(45, slots_45, district.pincode)
     )
-    if status_45:
+    if status_45:  # Update last mail time
         district.sub_45_last_mail_sent_on = datetime.now()
         db.session.commit()
         print(f'** Mail sent: <{district.pincode} 45+>')
@@ -117,7 +117,7 @@ def check_slots_and_send_email(district: Pincodes):
     seconds=30,
     max_instances=1,
 )
-def scheduled_check_all_pincodes():
+def scheduled_check_all_pincodes() -> None:
     with scheduler.app.app_context():
         print('** Checking for slots...')
 
@@ -125,6 +125,6 @@ def scheduled_check_all_pincodes():
             try:
                 check_slots_and_send_email(district)
             except ValueError as vErr:
-                print(f'Value Error: {vErr} <==')
+                print(f'Value Error: {vErr}')
             except HTTPError as httpErr:
                 print(f'Request Error: {httpErr}')
