@@ -1,20 +1,31 @@
 from flask_wtf import FlaskForm
-from wtforms import StringField, SubmitField, BooleanField, IntegerField
+from requests import get
+from requests.api import request
+from wtforms import BooleanField, IntegerField, StringField, SubmitField
 from wtforms.validators import DataRequired, Email, ValidationError
-# from flask_wtf.html5 import NumberInput
 from wtforms.widgets.html5 import NumberInput
 
 
-class Pincode(object):
+class PincodeValidator(object):
+    POSTAL_CODE_API = 'https://api.postalpincode.in/pincode/{}'
+    HEADERS = {
+        'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/90.0.4430.93 Safari/537.36',
+    }
+
     def __init__(self, message='Invalid Pincode'):
         self.message = message
 
     def __call__(self, form, field):
-        if field.data is None:
+        if not field.data:
             raise ValidationError(self.message)
-        data = str(field.data)
-        if len(data) != 6 and data.isnumeric():
-            raise ValidationError(self.message)
+
+        response = get(
+            url=self.POSTAL_CODE_API.format(field.data),
+            headers=self.HEADERS
+        )
+
+        if response.status_code != 200 or response.json()[0]['Status'] != 'Success':
+            raise ValidationError('Pincode does not exists')
 
 
 class SubscribeForm(FlaskForm):
@@ -33,7 +44,7 @@ class SubscribeForm(FlaskForm):
         'Pincode',
         validators=[
             DataRequired(),
-            Pincode(),
+            PincodeValidator(),
         ],
         widget=NumberInput(),
     )

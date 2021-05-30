@@ -46,9 +46,9 @@ def index():
                 user_name=subscriber.name,
                 pincode=pincode.pincode,
             )
-            msg = Message('Subscribied successfully for Cowin Alerts!',
-                          recipients=[subscriber.email], html=success_msg)
-            mail.send(msg)
+            mail.send(Message('Subscribied successfully for Cowin Alerts!',
+                              recipients=[subscriber.email],
+                              html=success_msg))
 
             return redirect(url_for('index_bp.index', success=True))
 
@@ -58,3 +58,8 @@ def index():
         sub_form=sub_form,
         success=form_status,
     )
+
+
+@index_bp.get('/r')
+def run():
+    return render_template('vaccine-available.html')
