@@ -1,5 +1,4 @@
 from sqlalchemy import Boolean, Column, DateTime, ForeignKey, Integer, String, UniqueConstraint
-from sqlalchemy.orm import relation
 
 from ._db import db
 
@@ -22,13 +21,13 @@ class SubscriberPincodePreferences(db.Model):
         preference_id),)
 
     subscriber = db.relationship(
-        "Subscriber",
+        "Subscribers",
         back_populates="subscriptions",
     )
     preference = db.relationship('Preference')
     pincode = db.relationship(
         "Pincodes",
-        back_populates="subscriber_pincode_preferences",
+        back_populates="subscriptions",
     )
 
 
@@ -45,10 +44,6 @@ class Subscribers(db.Model):
         back_populates="subscriber"
     )
 
-    def update_preferences(self, **kwargs):
-        self.sub_18 = kwargs.get('sub_18', self.sub_18)
-        self.sub_45 = kwargs.get('sub_45', self.sub_45)
-
 
 class Pincodes(db.Model):
     __tablename__ = 'pincodes'
@@ -59,8 +54,9 @@ class Pincodes(db.Model):
 
     subscriptions = db.relationship(
         'SubscriberPincodePreferences',
-        back_populates="subscriber"
+        back_populates="pincode"
     )
+
 
 class Preference(db.Model):
     __tablename__ = 'preference'
