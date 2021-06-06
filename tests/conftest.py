@@ -15,14 +15,7 @@ def app():
         db.drop_all()
 
 
-# @pytest.fixture(scope="session")
-# def client():
-#     app = create_app('testing')
-#     with app.app_context():
-#         # with app.test_client() as client:
-#         db.create_all()
-
-#         yield app
-
-#         db.session.remove()
-#         db.drop_all()
+@pytest.fixture(scope="session")
+def client(app):
+    with app.test_client() as client:
+        yield client
