@@ -21,11 +21,14 @@ def create_app(config_name):
     scheduler.init_app(app)
 
     with app.app_context():
-        if not app.config.get('FLASK_DEBUG'):
-            from . import check_slots
+        '''
+        Enable later when app fully available
+        '''
+        # if not app.config.get('FLASK_DEBUG'):
+        #     from . import check_slots
 
-            scheduler.start()
-            print(' * => Scheduled job started <=')
+        #     scheduler.start()
+        #     print(' * => Scheduled job started <=')
 
         from . import index
         app.register_blueprint(index.index_bp)
