@@ -6,7 +6,7 @@
   {{field(class="form-control is-invalid",**kwargs)|safe }}
   <div class="invalid-feedback">
     {% for error in field.errors %}
-    <li>{{ error }}</li>
+    <strong>{{ error }}</strong>
     {% endfor %}
   </div>
   {%else%} {{field(class="form-control",**kwargs)|safe }} {% endif %} {{field.label()}}

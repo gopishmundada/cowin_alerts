@@ -60,6 +60,8 @@ class TestConfig(BaseConfig):
 
     SQLALCHEMY_DATABASE_URI = environ.get('TEST_DATABASE_URL')
 
+    WTF_CSRF_ENABLED = False
+
 
 config_by_name = dict(
     production=BaseConfig,
