@@ -20,10 +20,14 @@ def test_SubscribeNewUserNewPincode(app):
             sub_45=True,
             submit=True
         )
+
         form = SubscribeForm(
-            name='Akshay', email='shegaoka@gmail.com', sub_18=True, sub_45=True)
-        print(form.data)
-        response = client.post('/', data=data, follow_redirects=True)
+            name='Akshay', email='shegaoka@gmail.com', pincode=431203, sub_18=True, sub_45=True, submit=True)
+
+        response = client.post('/', data=form.data, follow_redirects=True)
+
+        print(response.get_data(
+            as_text=True))
 
         assert response.status_code == 200
         assert 'You have successfully registered for' in response.get_data(

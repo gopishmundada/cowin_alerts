@@ -40,7 +40,6 @@ def index():
     form_status = request.args.get('success')
 
     if sub_form.validate_on_submit():
-        print('=====> Testing 1')
         if not sub_form.sub_18.data and not sub_form.sub_45.data:
             flash('Please select at least 1 age group')
         else:
@@ -75,8 +74,7 @@ def index():
                 user_name=subscriber.name
             )
 
-            print('=====> Testing 1')
-            return redirect(url_for('index_bp.run', success=True))
+            return redirect(url_for('index_bp.index', success=True))
 
     return render_template(
         'index.html',
