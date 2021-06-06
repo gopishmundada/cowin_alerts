@@ -10,3 +10,4 @@ Flask-APScheduler
 requests
 pandas
 Flask-Mail
+pytest
