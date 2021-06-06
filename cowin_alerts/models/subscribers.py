@@ -1,3 +1,4 @@
+from cowin_alerts.forms import subscribe
 from sqlalchemy import Boolean, Column, DateTime, ForeignKey, Integer, String, UniqueConstraint
 
 from ._db import db
@@ -38,6 +39,7 @@ class Subscribers(db.Model):
     name = Column(String(255), nullable=False)
     email = Column(String(255), nullable=False, unique=True)
     phone = Column(String(13), unique=True)
+    subscribed = Column(Boolean, nullable=False, default=True)
 
     subscriptions = db.relationship(
         'SubscriberPincodePreferences',

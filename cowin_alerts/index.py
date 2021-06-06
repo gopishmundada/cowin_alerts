@@ -1,4 +1,4 @@
-from flask import Blueprint, flash, redirect, render_template, request, url_for
+from flask import abort, Blueprint, flash, redirect, render_template, request, url_for
 from flask_mail import Message
 from sqlalchemy import and_
 
@@ -82,6 +82,19 @@ def index():
         sub_form=sub_form,
         success=form_status,
     )
+
+
+@index_bp.post('/unsubscribe/<string:email>')
+def unsubscribe(email):
+    user = Subscribers.query.filter(Subscribers.email == email).first()
+
+    if not user:
+        return 'User not found', 400
+
+    user.subscribed = False
+    db.session.commit()
+
+    return 'unsubscribed'
 
 
 @index_bp.get('/r')

@@ -1,3 +1,6 @@
+from flask.wrappers import Response
+
+
 def test_getIndexPage(client):
     response = client.get('/')
 
@@ -124,3 +127,32 @@ def test_SubscribeExisitingUserExistingPincodeUpdatePreference(client):
     assert response.status_code == 200
     assert 'Your preferences have been updated' in response.get_data(
         as_text=True)
+
+
+def test_unSubscribeExistingUser(client):
+    data = dict(
+        name='John Wick',
+        email='john@wick.com',
+        pincode=431203,
+        sub_18=True,
+        sub_45=False,
+        submit=True
+    )
+
+    response = client.post('/', data=data, follow_redirects=True)
+
+    assert response.status_code == 200
+    assert 'You have successfully registered for' in response.get_data(
+        as_text=True)
+
+    response = client.post(f'/unsubscribe/{data["email"]}')
+
+    assert response.status_code == 200
+    assert 'unsubscribed' in response.get_data(as_text=True)
+
+
+def test_unSubscribeUnknownEmail(client):
+    response = client.post('/unsubscribe/abc@gmail.com')
+
+    assert response.status_code == 400
+    assert 'User not found' in response.get_data(as_text=True)
