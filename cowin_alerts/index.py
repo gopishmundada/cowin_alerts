@@ -91,7 +91,8 @@ def unsubscribe(email):
     if not user:
         return 'User not found', 400
 
-    user.subscribed = False
+    SubscriberPincodePreferences.query.filter(
+        SubscriberPincodePreferences.subscriber == user).delete()
     db.session.commit()
 
     return 'Successfully unsubscribed'

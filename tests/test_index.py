@@ -1,3 +1,6 @@
+from cowin_alerts.models import SubscriberPincodePreferences, Subscribers
+
+
 def test_getIndexPage(client):
     response = client.get('/')
 
@@ -122,11 +125,11 @@ def test_SubscribeExisitingUserExistingPincodeUpdatePreference(client):
     response = client.post('/', data=data, follow_redirects=True)
 
     assert response.status_code == 200
-    assert 'Your preferences have been updated' in response.get_data(
+    assert 'You have successfully registered for' in response.get_data(
         as_text=True)
 
 
-def test_unSubscribeExistingUser(client):
+def test_unSubscribeExistingUserResponse(client):
     data = dict(
         name='John Wick',
         email='john@wick.com',
@@ -146,6 +149,30 @@ def test_unSubscribeExistingUser(client):
 
     assert response.status_code == 200
     assert 'unsubscribed' in response.get_data(as_text=True)
+
+
+def test_unSubscribeExistingUserDB(client):
+    data = dict(
+        name='John Wick',
+        email='john@wick.com',
+        pincode=431203,
+        sub_18=True,
+        sub_45=False,
+        submit=True
+    )
+
+    response = client.post('/', data=data, follow_redirects=True)
+    assert response.status_code == 200
+
+    response = client.post(f'/unsubscribe/{data["email"]}')
+    assert response.status_code == 200
+    assert 'unsubscribed' in response.get_data(as_text=True)
+
+    user = Subscribers.query.filter_by(email=data["email"]).first()
+    subscriptions = SubscriberPincodePreferences.query.filter(
+        SubscriberPincodePreferences.subscriber == user).all()
+
+    assert [] == subscriptions
 
 
 def test_unSubscribeUnknownEmail(client):

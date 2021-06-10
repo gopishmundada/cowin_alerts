@@ -23,7 +23,7 @@ class BaseConfig(object):
 
     WTF_CSRF_ENABLED = True
 
-    SERVER_NAME = environ.get('SERVER_NAME') or 'https://akkisdiary.com'
+    SERVER_NAME = environ.get('SERVER_NAME')
     SECRET_KEY = environ.get('SECRET_KEY')
     FLASK_ENV = environ.get('FLASK_ENV')
 
