@@ -1,4 +1,3 @@
-from cowin_alerts.forms import subscribe
 from sqlalchemy import Boolean, Column, DateTime, ForeignKey, Integer, String, UniqueConstraint
 
 from ._db import db
@@ -93,7 +92,7 @@ class Preference(db.Model):
     sub_45 = Column(Boolean, nullable=False)
 
     @classmethod
-    def find(self, sub_18, sub_45):
+    def get_or_create(self, sub_18, sub_45):
         preference = Preference.query.filter_by(
             sub_18=sub_18, sub_45=sub_45).first()
 

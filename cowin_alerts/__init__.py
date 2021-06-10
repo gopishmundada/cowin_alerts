@@ -22,13 +22,13 @@ def create_app(config_name):
 
     with app.app_context():
         '''
-        Enable later when app fully available
+        Todo: Enable on heroku later when app fully available
         '''
-        # if not app.config.get('FLASK_DEBUG'):
+        # if not (app.config.get('FLASK_DEBUG') or app.config.get('TESTING')):
         #     from . import check_slots
 
         #     scheduler.start()
-        #     print(' * => Scheduled job started <=')
+        #     print(' * Scheduled job started')
 
         from . import index
         app.register_blueprint(index.index_bp)

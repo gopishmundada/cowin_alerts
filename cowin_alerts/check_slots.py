@@ -1,12 +1,16 @@
 from datetime import datetime, timedelta
 
 import requests
-from flask_mail import Message
 from flask import current_app
+from flask.templating import render_template
+from flask_mail import Message
 from requests.exceptions import HTTPError
+from sqlalchemy import and_
+
+from cowin_alerts.models.subscribers import Preference
 
 from . import mail
-from .models import Pincodes, db
+from .models import Pincodes, SubscriberPincodePreferences, db
 from .scheduler import scheduler
 
 EMAIL_SUBJECT = 'Vaccine slots available for {}+'
@@ -58,12 +62,13 @@ def send_available_email(
     last_mail_on: datetime,
     slots: int,
     subject: str,
-    body: str = 'Vaccine Slots are available'
+    pincode: str,
 ) -> bool:
     '''
     Sends vaccine availability mail to recipients if mail can be send.
     Checks for number of available slots and last mail sent datetime.
 
+    :param recipients: List of user name and email e.g [('John','john@wick.com'), ('Tony', 'tony@stark.com')]
     :return: True if mail sent successfully False otherwise.
     '''
 
@@ -72,9 +77,53 @@ def send_available_email(
     if not can_send_mail(slots, last_mail_on):
         return False
 
-    mail.send(Message(subject=subject, html=body, bcc=recipients))
+    for name, email in recipients:
+        body = render_template('vaccine-available.html',
+                               name=name,
+                               email=email,
+                               slots=slots,
+                               pincode=pincode)
+        mail.send(Message(subject=subject, html=body, recipients=[email]))
 
     return True
+
+
+def get_subscribers_list(district: Pincodes, sub_18: bool, sub_45: bool):
+    '''
+    Returns list of user name and email e.g [('John','john@wick.com'), ('Tony', 'tony@stark.com')]
+    '''
+
+    if sub_18 == None and sub_45 == None:
+        raise ValueError('Both args cannot be None')
+
+    if sub_18 != None and sub_45 != None:
+        preference = Preference.get_or_create(sub_18, sub_45)
+        condition = and_(SubscriberPincodePreferences.preference == preference,
+                         SubscriberPincodePreferences.pincode == district)
+        return list(map(lambda u: (u.subscriber.name, u.subscriber.email),
+                               SubscriberPincodePreferences.query.filter(condition)))
+    elif sub_18 != None:
+        preferences = Preference.query.filter_by(sub_18=sub_18)
+        recipients = []
+
+        for pref in preferences:
+            recipients += list(map(lambda u: (u.subscriber.name, u.subscriber.email),
+                                   SubscriberPincodePreferences.query.filter_by(pincode_id=district.id,
+                                                                                preference_id=pref.id)))
+
+        return recipients
+    else:
+        preferences = Preference.query.filter_by(sub_45=sub_45)
+        recipients = []
+
+        for pref in preferences:
+            condition = and_(SubscriberPincodePreferences.preference == pref,
+                             SubscriberPincodePreferences.pincode == district)
+            recipients += list(map(lambda u: (u.subscriber.name, u.subscriber.email),
+                                   SubscriberPincodePreferences.query.filter_by(pincode_id=district.id,
+                                                                                preference_id=pref.id)))
+
+        return recipients
 
 
 def check_slots_and_send_email(district: Pincodes) -> None:
@@ -86,11 +135,11 @@ def check_slots_and_send_email(district: Pincodes) -> None:
 
     # Send mail to 18+ subscribers if slots are available
     status_18 = send_available_email(
-        recipients=[sub.email for sub in district.subscribers if sub.sub_18],
+        recipients=get_subscribers_list(district, True, None),
         last_mail_on=district.sub_18_last_mail_sent_on,
         slots=slots_18,
         subject=EMAIL_SUBJECT.format(18),
-        body=EMAIL_BODY.format(18, slots_18, district.pincode)
+        pincode=district.pincode,
     )
     if status_18:  # Update last mail time
         district.sub_18_last_mail_sent_on = datetime.now()
@@ -99,11 +148,11 @@ def check_slots_and_send_email(district: Pincodes) -> None:
 
     # Send mail to 45+ subscribers if slots are available
     status_45 = send_available_email(
-        recipients=[sub.email for sub in district.subscribers if sub.sub_45],
+        recipients=get_subscribers_list(district, None, True),
         last_mail_on=district.sub_45_last_mail_sent_on,
         slots=slots_45,
         subject=EMAIL_SUBJECT.format(45),
-        body=EMAIL_BODY.format(45, slots_45, district.pincode)
+        pincode=district.pincode,
     )
     if status_45:  # Update last mail time
         district.sub_45_last_mail_sent_on = datetime.now()

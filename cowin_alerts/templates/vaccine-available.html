@@ -1,12 +1,53 @@
-<!DOCTYPE html>
-<html lang="en">
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional //EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html
+  xmlns="http://www.w3.org/1999/xhtml"
+  xmlns:v="urn:schemas-microsoft-com:vml"
+  xmlns:o="urn:schemas-microsoft-com:office:office"
+>
+  <meta http-equiv="Content-Type" content="text/html; charset=UTF-8" />
   <head>
-    <meta charset="UTF-8" />
-    <meta http-equiv="X-UA-Compatible" content="IE=edge" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>Vaccine Available</title>
+    <meta name="x-apple-disable-message-reformatting" />
+    <meta http-equiv="X-UA-Compatible" content="IE=edge" />
+    <title></title>
+    <style type="text/css">
+      .content-area {
+        background-color: #f6f7f1;
+        padding: 3rem;
+        width: 100%;
+        border-radius: 10px;
+        width: fit-content;
+        height: fit-content;
+        color: #db9487;
+        font-family: Raleway, sans-serif;
+        font-size: 20px;
+      }
+      h1 {
+        color: #34a0a4;
+      }
+    </style>
+    <link
+      href="https://fonts.googleapis.com/css?family=Raleway:400,700&display=swap"
+      rel="stylesheet"
+      type="text/css"
+    />
   </head>
   <body>
-    <h1>Vaccine Available</h1>
+    <div class="content-area">
+      <h1>18+ Vaccine Available</h1>
+      <p>Dear <i>{{name}},</i></p>
+      <p>
+        <strong>{{slots}} Vaccine slots</strong> are available for pincode
+        <strong>{{pincode}}</strong>
+      </p>
+      <p>
+        Please book your slots immediately from
+        <a href="https://www.cowin.gov.in/" target="_blank">Cowin website.</a>
+      </p>
+      <br />
+      <form action="{{url_for('index_bp.unsubscribe', email=email)}}" method="POST">
+        <small>To unsubscribe from vaccine alerts click <button type="submit">here</button></small>
+      </form>
+    </div>
   </body>
 </html>

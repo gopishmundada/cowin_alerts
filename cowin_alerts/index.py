@@ -44,13 +44,13 @@ def index():
             flash('Please select at least 1 age group')
         else:
             pincode = Pincodes.get_or_create(sub_form.pincode.data)
-            preference = Preference.find(
+            preference = Preference.get_or_create(
                 sub_form.sub_18.data,
                 sub_form.sub_45.data,
             )
             subscriber = Subscribers.get_or_create(
                 sub_form.email.data.lower().strip(),
-                sub_form.name.data.lower(),
+                sub_form.name.data.strip(),
             )
 
             subscription = SubscriberPincodePreferences.query.filter(and_(
@@ -94,9 +94,9 @@ def unsubscribe(email):
     user.subscribed = False
     db.session.commit()
 
-    return 'unsubscribed'
+    return 'Successfully unsubscribed'
 
 
-@index_bp.get('/r')
+@index_bp.get('/run')
 def run():
-    return render_template('vaccine-available.html')
+    return render_template('vaccine-available.html', name='Akshay', email='aksahy@gmail.com', slots=123, pincode=32341)
