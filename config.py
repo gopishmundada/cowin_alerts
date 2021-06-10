@@ -41,10 +41,12 @@ class BaseConfig(object):
     MAIL_USE_SSL = True
     MAIL_DEFAULT_SENDER = MAIL_USERNAME
 
-    ALERT_INTERVAL = environ.get('ALERT_INTERVAL') or 30
+    ALERT_INTERVAL = environ.get('ALERT_INTERVAL', 30)
     SCHEDULER_API_ENABLED = True
 
     CALENDER_BY_PIN_URL = COWIN_API_PROD + CALENDER_BY_PIN_PATH
+
+    ALERT_DELAY_HOURS = environ.get('ALERT_DELAY_HOURS', 24)
 
 
 class DevelopmentConfig(BaseConfig):

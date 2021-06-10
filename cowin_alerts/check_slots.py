@@ -49,7 +49,7 @@ def get_slots(json_data: dict) -> tuple:
 def can_send_mail(slots: int, mail_sent_on: datetime) -> bool:
     if slots and slots > 0:
         if isinstance(mail_sent_on, datetime):
-            last_hour = datetime.now() - timedelta(hours=1)
+            last_hour = datetime.now() - timedelta(hours=current_app.config.get('ALERT_DELAY_HOURS',24))
             return mail_sent_on < last_hour
         else:
             return True

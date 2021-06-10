@@ -28,7 +28,7 @@ def send_subscriber_success_mail(email: str, pincode: int, user_name: str = 'Use
         pincode=pincode,
     )
 
-    mail.send(Message('Subscribied successfully for Cowin Alerts!',
+    mail.send(Message('Subscribed successfully for Cowin Alerts!',
                       recipients=[email],
                       html=success_msg))
 
