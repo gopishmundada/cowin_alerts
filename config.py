@@ -23,7 +23,7 @@ class BaseConfig(object):
 
     WTF_CSRF_ENABLED = True
 
-    SERVER_NAME = environ.get('SERVER_NAME')
+    SERVER_NAME = environ.get('SERVER_NAME') or 'https://akkisdiary.com'
     SECRET_KEY = environ.get('SECRET_KEY')
     FLASK_ENV = environ.get('FLASK_ENV')
 
@@ -57,6 +57,8 @@ class DevelopmentConfig(BaseConfig):
 class TestConfig(BaseConfig):
     FLASK_DEBUG = False
     TESTING = True
+
+    FLASK_ENV = 'testing'
 
     SQLALCHEMY_DATABASE_URI = environ.get('TEST_DATABASE_URL')
 

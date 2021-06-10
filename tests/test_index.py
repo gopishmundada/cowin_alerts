@@ -1,6 +1,3 @@
-from flask.wrappers import Response
-
-
 def test_getIndexPage(client):
     response = client.get('/')
 
