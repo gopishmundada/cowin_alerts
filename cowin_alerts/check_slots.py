@@ -10,7 +10,7 @@ from sqlalchemy import and_
 from cowin_alerts.models.subscribers import Preference
 
 from . import mail
-from .models import Pincodes, SubscriberPincodePreferences, db
+from .models import Pincodes, Subscriptions, db
 from .scheduler import scheduler
 
 EMAIL_SUBJECT = 'Vaccine slots available for {}+'
@@ -98,18 +98,18 @@ def get_subscribers_list(district: Pincodes, sub_18: bool, sub_45: bool):
 
     if sub_18 != None and sub_45 != None:
         preference = Preference.get_or_create(sub_18, sub_45)
-        condition = and_(SubscriberPincodePreferences.preference == preference,
-                         SubscriberPincodePreferences.pincode == district)
+        condition = and_(Subscriptions.preference == preference,
+                         Subscriptions.pincode == district)
         return list(map(lambda u: (u.subscriber.name, u.subscriber.email),
-                               SubscriberPincodePreferences.query.filter(condition)))
+                               Subscriptions.query.filter(condition)))
     elif sub_18 != None:
         preferences = Preference.query.filter_by(sub_18=sub_18)
         recipients = []
 
         for pref in preferences:
             recipients += list(map(lambda u: (u.subscriber.name, u.subscriber.email),
-                                   SubscriberPincodePreferences.query.filter_by(pincode_id=district.id,
-                                                                                preference_id=pref.id)))
+                                   Subscriptions.query.filter_by(pincode_id=district.id,
+                                                                 preference_id=pref.id)))
 
         return recipients
     else:
@@ -117,11 +117,11 @@ def get_subscribers_list(district: Pincodes, sub_18: bool, sub_45: bool):
         recipients = []
 
         for pref in preferences:
-            condition = and_(SubscriberPincodePreferences.preference == pref,
-                             SubscriberPincodePreferences.pincode == district)
+            condition = and_(Subscriptions.preference == pref,
+                             Subscriptions.pincode == district)
             recipients += list(map(lambda u: (u.subscriber.name, u.subscriber.email),
-                                   SubscriberPincodePreferences.query.filter_by(pincode_id=district.id,
-                                                                                preference_id=pref.id)))
+                                   Subscriptions.query.filter_by(pincode_id=district.id,
+                                                                 preference_id=pref.id)))
 
         return recipients
 

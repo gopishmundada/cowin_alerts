@@ -3,13 +3,13 @@ from sqlalchemy import Boolean, Column, DateTime, ForeignKey, Integer, String, U
 from ._db import db
 
 
-class SubscriberPincodePreferences(db.Model):
-    __tablename__ = 'subscriber_pincode_preferences'
+class Subscriptions(db.Model):
+    __tablename__ = 'subscriptions'
 
     id = Column(Integer, primary_key=True)
 
     subscriber_id = Column(Integer, ForeignKey(
-        "subscribers.id"), nullable=False)
+        "users.id"), nullable=False)
     pincode_id = Column(Integer, ForeignKey(
         "pincodes.id"), nullable=False)
     preference_id = Column(Integer, ForeignKey(
@@ -21,41 +21,43 @@ class SubscriberPincodePreferences(db.Model):
         preference_id),)
 
     subscriber = db.relationship(
-        "Subscribers",
+        "Users",
         back_populates="subscriptions",
     )
-    preference = db.relationship('Preference')
+    preference = db.relationship(
+        'Preference',
+        back_populates='subscriptions',
+    )
     pincode = db.relationship(
         "Pincodes",
         back_populates="subscriptions",
     )
 
 
-class Subscribers(db.Model):
-    __tablename__ = 'subscribers'
+class Users(db.Model):
+    __tablename__ = 'users'
 
     id = Column(Integer, primary_key=True)
     name = Column(String(255), nullable=False)
     email = Column(String(255), nullable=False, unique=True)
     phone = Column(String(13), unique=True)
-    subscribed = Column(Boolean, nullable=False, default=True)
 
     subscriptions = db.relationship(
-        'SubscriberPincodePreferences',
+        'Subscriptions',
         back_populates="subscriber"
     )
 
     @classmethod
     def get_or_create(cls, email, name):
-        subscriber = cls.query.filter_by(email=email).first()
+        user = cls.query.filter_by(email=email).first()
 
-        if not subscriber:
-            subscriber = Subscribers(email=email, name=name)
+        if not user:
+            user = cls(email=email, name=name)
 
-            db.session.add(subscriber)
+            db.session.add(user)
             db.session.commit()
 
-        return subscriber
+        return user
 
 
 class Pincodes(db.Model):
@@ -67,7 +69,7 @@ class Pincodes(db.Model):
     sub_45_last_mail_sent_on = Column(DateTime)
 
     subscriptions = db.relationship(
-        'SubscriberPincodePreferences',
+        'Subscriptions',
         back_populates="pincode"
     )
 
@@ -90,6 +92,11 @@ class Preference(db.Model):
     id = Column(Integer, primary_key=True)
     sub_18 = Column(Boolean, nullable=False)
     sub_45 = Column(Boolean, nullable=False)
+
+    subscriptions = db.relationship(
+        'Subscriptions',
+        back_populates="preference"
+    )
 
     @classmethod
     def get_or_create(self, sub_18, sub_45):

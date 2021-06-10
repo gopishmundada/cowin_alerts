@@ -1,4 +1,4 @@
-from cowin_alerts.models import SubscriberPincodePreferences, Subscribers
+from cowin_alerts.models import Subscriptions, Users
 
 
 def test_getIndexPage(client):
@@ -168,9 +168,9 @@ def test_unSubscribeExistingUserDB(client):
     assert response.status_code == 200
     assert 'unsubscribed' in response.get_data(as_text=True)
 
-    user = Subscribers.query.filter_by(email=data["email"]).first()
-    subscriptions = SubscriberPincodePreferences.query.filter(
-        SubscriberPincodePreferences.subscriber == user).all()
+    user = Users.query.filter_by(email=data["email"]).first()
+    subscriptions = Subscriptions.query.filter(
+        Subscriptions.subscriber == user).all()
 
     assert [] == subscriptions
 

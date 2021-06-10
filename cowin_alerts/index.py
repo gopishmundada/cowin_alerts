@@ -1,11 +1,10 @@
-from flask import abort, Blueprint, flash, redirect, render_template, request, url_for
+from flask import Blueprint, flash, redirect, render_template, request, url_for
 from flask_mail import Message
 from sqlalchemy import and_
 
 from . import mail
 from .forms import SubscribeForm
-from .models import (Pincodes, Preference, SubscriberPincodePreferences,
-                     Subscribers, db)
+from .models import Pincodes, Preference, Subscriptions, Users, db
 
 index_bp = Blueprint(
     'index_bp',
@@ -48,18 +47,18 @@ def index():
                 sub_form.sub_18.data,
                 sub_form.sub_45.data,
             )
-            subscriber = Subscribers.get_or_create(
+            subscriber = Users.get_or_create(
                 sub_form.email.data.lower().strip(),
                 sub_form.name.data.strip(),
             )
 
-            subscription = SubscriberPincodePreferences.query.filter(and_(
-                SubscriberPincodePreferences.subscriber == subscriber, SubscriberPincodePreferences.pincode == pincode)).first()
+            subscription = Subscriptions.query.filter(and_(
+                Subscriptions.subscriber == subscriber, Subscriptions.pincode == pincode)).first()
 
             if subscription:
                 subscription.preference = preference
             else:
-                subscription = SubscriberPincodePreferences(
+                subscription = Subscriptions(
                     subscriber=subscriber,
                     pincode=pincode,
                     preference=preference,
@@ -86,13 +85,13 @@ def index():
 
 @index_bp.post('/unsubscribe/<string:email>')
 def unsubscribe(email):
-    user = Subscribers.query.filter(Subscribers.email == email).first()
+    user = Users.query.filter(Users.email == email).first()
 
     if not user:
         return 'User not found', 400
 
-    SubscriberPincodePreferences.query.filter(
-        SubscriberPincodePreferences.subscriber == user).delete()
+    Subscriptions.query.filter(
+        Subscriptions.subscriber == user).delete()
     db.session.commit()
 
     return 'Successfully unsubscribed'

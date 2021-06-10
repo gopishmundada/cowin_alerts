@@ -53,7 +53,7 @@ def upgrade():
                     sa.ForeignKeyConstraint(
                         ['preference_id'], ['preference.id'], ),
                     sa.ForeignKeyConstraint(
-                        ['subscriber_id'], ['subscribers.id'], ),
+                        ['subscriber_id'], ['Users.id'], ),
                     sa.PrimaryKeyConstraint('id'),
                     sa.UniqueConstraint(
                         'subscriber_id', 'pincode_id', 'preference_id')
@@ -81,7 +81,7 @@ def downgrade():
                     sa.ForeignKeyConstraint(
                         ['pincode'], ['pincodes.pincode'], name='subscriber_pincode_pincode_fkey'),
                     sa.ForeignKeyConstraint(['subscriber_id'], [
-                        'subscribers.id'], name='subscriber_pincode_subscriber_id_fkey'),
+                        'Users.id'], name='subscriber_pincode_subscriber_id_fkey'),
                     sa.PrimaryKeyConstraint(
                         'subscriber_id', 'pincode', name='subscriber_pincode_pkey')
                     )

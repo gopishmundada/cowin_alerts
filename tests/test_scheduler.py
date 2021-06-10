@@ -1,34 +1,34 @@
 from cowin_alerts.check_slots import get_subscribers_list
 from cowin_alerts.models import (Pincodes, Preference,
-                                 SubscriberPincodePreferences, Subscribers, db)
+                                 Subscriptions, Users, db)
 
 
 def test_getRecipientsList(app):
     district1 = Pincodes(pincode=431203)
     district2 = Pincodes(pincode=431204)
-    user1 = Subscribers(email='tony@stark.com', name='Ironman')
+    user1 = Users(email='tony@stark.com', name='Ironman')
 
     db.session.add_all([district1, district2, user1])
     db.session.commit()
 
     subscriptions = [
-        SubscriberPincodePreferences(
+        Subscriptions(
             subscriber=user1,
             pincode=district1,
             preference=Preference.get_or_create(True, True),
         ),
-        SubscriberPincodePreferences(
-            subscriber=Subscribers(email='arya@stark.com', name='Needle'),
+        Subscriptions(
+            subscriber=Users(email='arya@stark.com', name='Needle'),
             pincode=district1,
             preference=Preference.get_or_create(True, False),
         ),
-        SubscriberPincodePreferences(
+        Subscriptions(
             subscriber=user1,
             pincode=district2,
             preference=Preference.get_or_create(True, True),
         ),
-        SubscriberPincodePreferences(
-            subscriber=Subscribers(email='maha@dev.com', name='Bhole'),
+        Subscriptions(
+            subscriber=Users(email='maha@dev.com', name='Bhole'),
             pincode=district1,
             preference=Preference.get_or_create(True, True),
         ),
