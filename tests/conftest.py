@@ -1,6 +1,6 @@
 import pytest
 from cowin_alerts import create_app, db
-from cowin_alerts.worker import VaccineNotifier
+from cowin_alerts.VaccineNotifier import VaccineNotifier
 from cowin_alerts.VaccineDB import VaccineDB
 
 
@@ -24,8 +24,8 @@ def client(app):
 
 
 @pytest.fixture
-def notifier():
-    return VaccineNotifier()
+def notifier(vaccine_db):
+    return VaccineNotifier(vaccine_db)
 
 
 @pytest.fixture

@@ -63,12 +63,12 @@ class VaccineDB:
 
     def get_subscribers_list(self, pincode: int, sub_18: bool = None, sub_45: bool = None) -> list:
         '''
-        Returns list of user name and email e.g [('John','john@wick.com'), ('Tony', 'tony@stark.com')]
+        Returns list of username and email e.g [('John','john@wick.com'), ('Tony', 'tony@stark.com')]
 
             :param pincode: Integer pincode of the district the user is subscribed to.
             :param sub_18: Boolean indicating if the user subscribed to 18+ slots. Can be `None`
-            :param sub_45: Boolean indicating if the user subscribed to 18+ slots. Can be `None`
-            
+            :param sub_45: Boolean indicating if the user subscribed to 45+ slots. Can be `None`
+
             :returns: List of tuple of username and their email.
         '''
         pass
