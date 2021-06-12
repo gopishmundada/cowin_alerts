@@ -9,11 +9,11 @@ class Subscriptions(db.Model):
     id = Column(Integer, primary_key=True)
 
     subscriber_id = Column(Integer, ForeignKey(
-        "users.id"), nullable=False)
+        'users.id'), nullable=False)
     pincode_id = Column(Integer, ForeignKey(
-        "pincodes.id"), nullable=False)
+        'pincodes.id'), nullable=False)
     preference_id = Column(Integer, ForeignKey(
-        "preference.id"), nullable=False)
+        'preference.id'), nullable=False)
 
     __table_args__ = (UniqueConstraint(
         subscriber_id,
@@ -21,16 +21,16 @@ class Subscriptions(db.Model):
         preference_id),)
 
     subscriber = db.relationship(
-        "Users",
-        back_populates="subscriptions",
+        'Users',
+        back_populates='subscriptions',
     )
     preference = db.relationship(
         'Preference',
         back_populates='subscriptions',
     )
     pincode = db.relationship(
-        "Pincodes",
-        back_populates="subscriptions",
+        'Pincodes',
+        back_populates='subscriptions',
     )
 
 
@@ -44,7 +44,8 @@ class Users(db.Model):
 
     subscriptions = db.relationship(
         'Subscriptions',
-        back_populates="subscriber"
+        back_populates='subscriber',
+        cascade='all, delete',
     )
 
     @classmethod
@@ -70,7 +71,8 @@ class Pincodes(db.Model):
 
     subscriptions = db.relationship(
         'Subscriptions',
-        back_populates="pincode"
+        back_populates='pincode',
+        cascade='all, delete',
     )
 
     @classmethod
@@ -95,7 +97,8 @@ class Preference(db.Model):
 
     subscriptions = db.relationship(
         'Subscriptions',
-        back_populates="preference"
+        back_populates='preference',
+        cascade='all, delete',
     )
 
     @classmethod

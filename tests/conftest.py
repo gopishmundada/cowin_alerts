@@ -1,5 +1,7 @@
 import pytest
 from cowin_alerts import create_app, db
+from cowin_alerts.worker import VaccineNotifier
+from cowin_alerts.VaccineDB import VaccineDB
 
 
 @pytest.fixture
@@ -19,3 +21,19 @@ def app():
 def client(app):
     with app.test_client() as client:
         yield client
+
+
+@pytest.fixture
+def notifier():
+    return VaccineNotifier()
+
+
+@pytest.fixture
+def vaccine_db():
+    vaccine_db = VaccineDB(testing=True)
+
+    vaccine_db.populate_test_db()
+
+    yield vaccine_db
+
+    vaccine_db.drop_all()
