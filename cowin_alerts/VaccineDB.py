@@ -7,22 +7,6 @@ from dotenv import load_dotenv
 basedir = path.abspath(path.dirname(__file__))
 load_dotenv(path.join(basedir, '.env'))
 
-DB_URL = urlparse(environ.get('DATABASE_URL'))
-
-USERNAME = DB_URL.username
-PASSWORD = DB_URL.password
-DATABASE = DB_URL.path[1:]
-HOST = DB_URL.hostname
-PORT = DB_URL.port
-
-TEST_DATABASE_URL = urlparse(environ.get('TEST_DATABASE_URL_2'))
-
-TEST_USERNAME = DB_URL.username
-TEST_PASSWORD = DB_URL.password
-TEST_DATABASE = DB_URL.path[1:]
-TEST_HOST = DB_URL.hostname
-TEST_PORT = DB_URL.port
-
 
 class VaccineDB:
     users_table = 'users'
@@ -33,23 +17,22 @@ class VaccineDB:
     def __init__(self, testing=False):
         self.testing = testing
 
-        if testing:
-            self.conn = psycopg2.connect(
-                database=TEST_DATABASE,
-                user=TEST_USERNAME,
-                password=TEST_PASSWORD,
-                host=TEST_HOST,
-                port=TEST_PORT
-            )
-        else:
-            self.conn = psycopg2.connect(
-                database=DATABASE,
-                user=USERNAME,
-                password=PASSWORD,
-                host=HOST,
-                port=PORT
-            )
+        db_url = ''
 
+        if not testing:
+            db_url = urlparse(environ.get('DATABASE_URL'))
+        else:
+            db_url = urlparse(environ.get('TEST_DATABASE_URL_2'))
+
+        print('=====>', db_url.path[1:])
+
+        self.conn = psycopg2.connect(
+            database=db_url.path[1:],
+            user=db_url.username,
+            password=db_url.password,
+            host=db_url.hostname,
+            port=db_url.port
+        )
         self.cur = self.conn.cursor()
 
     def _commit(self):

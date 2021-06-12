@@ -14,44 +14,44 @@ def test_getAllPincodes(vaccine_db):
     assert pincodes == [431203, 431204, 410507]
 
 
-def test_getRecipientsList(vaccine_db):
-    assert vaccine_db.get_recipients_list(
+def test_getSubscribersList(vaccine_db):
+    assert vaccine_db.get_subscribers_list(
         pincode=431203,
         sub_18=True,
         sub_45=True,
     ) == [('John Wick', 'john@wick.com'), ('Tony Stark', 'tony@stark.com')]
 
-    assert vaccine_db.get_recipients_list(
+    assert vaccine_db.get_subscribers_list(
         pincode=410507,
         sub_18=True,
         sub_45=True,
     ) == [('Tony Stark', 'tony@stark.com')]
 
-    assert vaccine_db.get_recipients_list(
+    assert vaccine_db.get_subscribers_list(
         pincode=410507,
         sub_18=True,
         sub_45=False,
     ) == [('Needle', 'arya@stark.com')]
 
-    assert vaccine_db.get_recipients_list(
+    assert vaccine_db.get_subscribers_list(
         pincode=431204,
         sub_18=False,
         sub_45=True,
     ) == [('John Wick', 'john@wick.com')]
 
-    assert vaccine_db.get_recipients_list(
+    assert vaccine_db.get_subscribers_list(
         pincode=431203,
         sub_18=True,
         sub_45=False,
     ) == []
 
-    assert vaccine_db.get_recipients_list(
+    assert vaccine_db.get_subscribers_list(
         pincode=431203,
         sub_18=True,
         sub_45=None,
     ) == [('John Wick', 'john@wick.com'), ('Tony Stark', 'tony@stark.com')]
 
-    assert vaccine_db.get_recipients_list(
+    assert vaccine_db.get_subscribers_list(
         pincode=431203,
         sub_18=None,
         sub_45=True,
